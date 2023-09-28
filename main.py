@@ -189,6 +189,7 @@ def contact():
             em = email.message.EmailMessage()
             em['From'] = ADMIN_EMAIL
             em['To'] = ADMIN_EMAIL
+            em['Subject'] = form.subject.data
             em.set_content(body_message, subtype="html")
             connection.send_message(em)
         flash(message='Yay! Message have been sent.')

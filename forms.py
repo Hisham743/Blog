@@ -34,5 +34,6 @@ class CommentForm(FlaskForm):
 class ContactForm(FlaskForm):
     name = StringField('Name', validators=[DataRequired()])
     email = EmailField('Email', validators=[DataRequired(), Email()])
+    subject = StringField('Subject', validators=[DataRequired()])
     message = CKEditorField('Comment', validators=[DataRequired()])
     submit = SubmitField('SEND MESSAGE!')
