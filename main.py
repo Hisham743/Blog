@@ -1,4 +1,6 @@
+import email.message
 import os
+import smtplib
 from datetime import date
 from flask import Flask, abort, render_template, redirect, url_for, flash
 from flask_bootstrap import Bootstrap5
@@ -9,7 +11,7 @@ from flask_sqlalchemy import SQLAlchemy
 from functools import wraps
 from werkzeug.security import generate_password_hash, check_password_hash
 from sqlalchemy.orm import relationship
-from forms import CreatePostForm, RegisterForm, LoginForm, CommentForm
+from forms import CreatePostForm, RegisterForm, LoginForm, CommentForm, ContactForm
 
 '''
 Make sure the required packages are installed: 
@@ -45,6 +47,8 @@ gravatar = Gravatar(app,
                     force_lower=False,
                     use_ssl=False,
                     base_url=None)
+
+ADMIN_EMAIL = os.environ.get('ADMIN_EMAIL')
 
 
 class Comment(db.Model):
@@ -174,9 +178,22 @@ def about():
     return render_template("about.html")
 
 
-@app.route("/contact")
+@app.route("/contact", methods=['GET', 'POST'])
 def contact():
-    return render_template("contact.html")
+    form = ContactForm()
+    if form.validate_on_submit():
+        body_message = f'Name: {form.name.data}\nEmail: {form.email.data}\n\n {form.message.data}'
+        with smtplib.SMTP('smtp.gmail.com', port=587) as connection:
+            connection.starttls()
+            connection.login(user=ADMIN_EMAIL, password=os.environ.get('APP_PASSWORD'))
+            em = email.message.EmailMessage()
+            em['From'] = ADMIN_EMAIL
+            em['To'] = ADMIN_EMAIL
+            em.set_content(body_message, subtype="html")
+            connection.send_message(em)
+        flash(message='Yay! Message have been sent.')
+        return redirect(url_for('contact'))
+    return render_template("contact.html", form=form)
 
 
 @app.route('/register', methods=['GET', 'POST'])
