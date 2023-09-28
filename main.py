@@ -182,7 +182,7 @@ def about():
 def contact():
     form = ContactForm()
     if form.validate_on_submit():
-        body_message = f'Name: {form.name.data}\nEmail: {form.email.data}\n\n {form.message.data}'
+        body_message = f'Name: {form.name.data}\n\nEmail: {form.email.data}\n\n\n\n{form.message.data}'
         with smtplib.SMTP('smtp.gmail.com', port=587) as connection:
             connection.starttls()
             connection.login(user=ADMIN_EMAIL, password=os.environ.get('APP_PASSWORD'))
